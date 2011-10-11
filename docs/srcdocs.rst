@@ -19,7 +19,7 @@ neural_net.py
    :undoc-members:
    :show-inheritance:
     
-                
+        
 .. index:: NN_sin.py
 
 .. _neural_net.sphinx_build.html._downloads.NN_sin.py:

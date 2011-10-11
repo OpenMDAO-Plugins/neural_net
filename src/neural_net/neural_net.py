@@ -1,26 +1,33 @@
-"""Surrogate Model based on an artificial neural network.
+""" Surrogate Model based on an artificial neural network.
 """
 
 from numpy import array
 from ffnet import ffnet,mlgraph
+from enthought.traits.api import HasTraits
 
 from openmdao.main.interfaces import implements, ISurrogate
 from openmdao.lib.datatypes.api import Int
-from enthought.traits.api import HasTraits
 
 
 class NeuralNet(HasTraits):
+    """ Surrogate model based on an artificial nueral network using the ffnet
+    package (http://ffnet.sourceforge.net/, GPL license).
+    This class follows the ISurrogate interface.    
+    """
+    
     implements(ISurrogate)
     
-    n_hidden_nodes = Int(4, iotype='in', desc = 'Number of hidden nodes in hidden layer of network')
+    n_hidden_nodes = Int(4, iotype='in', 
+                         desc = 'Number of hidden nodes in hidden layer of network')
     
     def __init__(self, n_hidden_nodes=4):
         """Initializes neural net surrogate model.
         
-            n_hidden_nodes: int
-                number of hidden nodes
+        n_hidden_nodes: int
+            number of hidden nodes
         """
         self.n_hidden_nodes = n_hidden_nodes
+        
     def get_uncertain_value(self, value):
         """Returns the value iself. Neural network can provide its own uncertainty. """
         return value
@@ -37,23 +44,23 @@ class NeuralNet(HasTraits):
         self._nn_surr = ffnet(mlgraph((n_inputs, self.n_hidden_nodes, 1)))
                         
         # Start the training
-        #self._nn_surr.train_genetic(inp, targ, individuals=10*n_inputs, generations=500)
+        self._nn_surr.train_cg(inp, targ, disp=False)
 
+        # Not sure why all these lines commented lines are here. -- KTM
+        #self._nn_surr.train_genetic(inp, targ, individuals=10*n_inputs, generations=500)
         #self._nn_surr.train_tnc(inp, targ,maxfun=5000)
-        
         #self._nn_surr.train_momentum(inp,targ,momentum=1)
         #self._nn_surr.train_rprop(inp,targ)
-        self._nn_surr.train_cg(inp,targ,disp=False)
         #self._nn_surr.train_bfgs(inp,targ)
                 
     def predict(self, X):
         """ Calculates a predicted value of the response based on the weights
          determined by the current neural network. """
         
-	output = self._nn_surr(X)
- 	
+        output = self._nn_surr(X)
         return output[0]
-  
+
+    
 if __name__ =="__main__":     
     import numpy as np    
     x = np.linspace(0, 5, 25)
@@ -69,5 +76,5 @@ if __name__ =="__main__":
     nn.train(inp,y)
         
     for a,p in zip(y,inp):
-	out = nn.predict(p)
-	print "%1.3f, %1.3f"%(a,out)
+        out = nn.predict(p)
+        print "%1.3f, %1.3f"%(a,out)

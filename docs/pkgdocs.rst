@@ -15,16 +15,24 @@ Package Metadata
 - **entry_points**:: 
 
     [openmdao.component]
-    NN_Sin.Sin=NN_Sin:Sin
     NN_sin.Sin=NN_sin:Sin
 
 - **home-page:** https://github.com/OpenMDAO-Plugins
 
 - **keywords:** openmdao
 
+- **maintainer:** Kenneth T. Moore
+
+- **maintainer-email:** kenneth-t-mooore-1@nasa.gov
+
 - **name:** neural_net
 
-- **requires-dist:** openmdao.main
+- **project-url:** https://github.com/OpenMDAO-Plugins/NeuralNet-Plugin
+
+- **requires-dist**:: 
+
+    openmdao.main
+    ffnet
 
 - **requires-python**:: 
 
@@ -35,5 +43,5 @@ Package Metadata
 
 - **summary:** neural_net package
 
-- **version:** 0.1
+- **version:** 0.2
 
