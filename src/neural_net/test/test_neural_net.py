@@ -1,5 +1,4 @@
 import unittest
-import random
 
 from numpy import array,round,linspace,sin,cos,pi
 import numpy.random as numpy_random
@@ -67,7 +66,7 @@ class Simulation(Assembly):
 class NeuralNetTestCase(unittest.TestCase): 
     
     def setUp(self): 
-        random.seed(10)
+        numpy_random.seed(10)
     
     def testNeuralNetTraining(self): 
         sim = Simulation()
@@ -82,8 +81,12 @@ class NeuralNetTestCase(unittest.TestCase):
         actual = [case['sin_calc.f_x'] for case in validate_data]  
         predicted = [case['sin_meta_model.f_x'] for case in validate_data]
         
-        avg_error = sum([(p-a)/a for a,p in zip(actual,predicted)])/len(actual)
+        avg_error = sum([abs(p-a) for a,p in zip(actual,predicted)])/len(actual)
         
-        self.assertTrue(avg_error <= .05)
+        self.assertTrue(avg_error <= .20)
         
     
+if __name__ == "__main__":
+    unittest.main()
+
+
