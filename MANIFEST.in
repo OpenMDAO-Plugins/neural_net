@@ -1,0 +1,5 @@
+
+
+graft src/neural_net/sphinx_build/html
+recursive-include src/neural_net/test *.py
+
