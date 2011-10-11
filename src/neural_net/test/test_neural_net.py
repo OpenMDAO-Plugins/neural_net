@@ -1,6 +1,6 @@
 import unittest
 
-from numpy import array,round,linspace,sin,cos,pi
+from numpy import sin
 import numpy.random as numpy_random
 
 from openmdao.main.api import Assembly, Component, SequentialWorkflow
@@ -39,7 +39,7 @@ class Simulation(Assembly):
         #Training the MetaModel
         self.add("DOE_Trainer",DOEdriver())
         self.DOE_Trainer.DOEgenerator = FullFactorial()
-        self.DOE_Trainer.DOEgenerator.num_levels = 10
+        self.DOE_Trainer.DOEgenerator.num_levels = 25
         self.DOE_Trainer.add_parameter("sin_meta_model.x")
         self.DOE_Trainer.case_outputs = ["sin_meta_model.f_x"]
         self.DOE_Trainer.add_event("sin_meta_model.train_next")
@@ -83,7 +83,7 @@ class NeuralNetTestCase(unittest.TestCase):
         
         avg_error = sum([abs(p-a) for a,p in zip(actual,predicted)])/len(actual)
         
-        self.assertTrue(avg_error <= .20)
+        self.assertTrue(avg_error <= .08)
         
     
 if __name__ == "__main__":
