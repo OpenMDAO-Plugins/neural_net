@@ -17,7 +17,7 @@ Package Metadata
     [openmdao.component]
     NN_sin.Sin=NN_sin:Sin
 
-- **home-page:** https://github.com/OpenMDAO-Plugins
+- **home-page:** https://github.com/OpenMDAO-Plugins/neural_net
 
 - **keywords:** openmdao
 
