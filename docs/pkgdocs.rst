@@ -21,6 +21,8 @@ Package Metadata
 
 - **keywords:** openmdao
 
+- **license:** GNU General Public License, version 2
+
 - **maintainer:** Kenneth T. Moore
 
 - **maintainer-email:** kenneth-t-mooore-1@nasa.gov
@@ -37,11 +39,11 @@ Package Metadata
 - **requires-python**:: 
 
     >=2.6
-    <2.7
+    <3.0
 
 - **static_path:** [ '_static' ]
 
-- **summary:** neural_net package
+- **summary:** OpenMDAO wrapper for a Feedforward Neural Net surrogate model that can be slotted into the MetaModel component
 
-- **version:** 0.2
+- **version:** 0.4
 
