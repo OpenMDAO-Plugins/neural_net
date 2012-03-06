@@ -43,7 +43,7 @@ class Simulation(Assembly):
         self.DOE_Trainer.add_parameter("sin_meta_model.x")
         self.DOE_Trainer.case_outputs = ["sin_meta_model.f_x"]
         self.DOE_Trainer.add_event("sin_meta_model.train_next")
-        self.DOE_Trainer.recorder = DBCaseRecorder()
+        self.DOE_Trainer.recorders = [DBCaseRecorder()]
         self.DOE_Trainer.force_execute = True
         
         #MetaModel Validation
@@ -53,7 +53,7 @@ class Simulation(Assembly):
         self.DOE_Validate.DOEgenerator.num_samples = 100
         self.DOE_Validate.add_parameter(("sin_meta_model.x","sin_calc.x"))
         self.DOE_Validate.case_outputs = ["sin_calc.f_x","sin_meta_model.f_x"]
-        self.DOE_Validate.recorder = DBCaseRecorder()
+        self.DOE_Validate.recorders = [DBCaseRecorder()]
         self.DOE_Validate.force_execute = True
         
         #Iteration Hierarchy
@@ -73,8 +73,8 @@ class NeuralNetTestCase(unittest.TestCase):
         sim.run()
         
         #This is how you can access any of the data
-        train_data = sim.DOE_Trainer.recorder.get_iterator()
-        validate_data = sim.DOE_Validate.recorder.get_iterator()
+        train_data = sim.DOE_Trainer.recorders[0].get_iterator()
+        validate_data = sim.DOE_Validate.recorders[0].get_iterator()
         train_inputs = [case['sin_meta_model.x'] for case in train_data]
         train_actual = [case['sin_meta_model.f_x'] for case in train_data]
         inputs = [case['sin_calc.x'] for case in validate_data]    
