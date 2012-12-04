@@ -3,13 +3,13 @@
 
 from numpy import array
 from ffnet import ffnet,mlgraph
-from enthought.traits.api import HasTraits
 
+from openmdao.main.api import Container
 from openmdao.main.interfaces import implements, ISurrogate
 from openmdao.lib.datatypes.api import Int
 
 
-class NeuralNet(HasTraits):
+class NeuralNet(Container):
     """ Surrogate model based on an artificial nueral network using the ffnet
     package (http://ffnet.sourceforge.net/, GPL license).
     This class follows the ISurrogate interface.    
