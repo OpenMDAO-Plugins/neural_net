@@ -25,7 +25,8 @@ available  through the MetaModel.
     from openmdao.lib.doegenerators.api import FullFactorial, Uniform
     from openmdao.lib.components.api import MetaModel
     from openmdao.lib.casehandlers.api import DBCaseRecorder
-    from openmdao.lib.surrogatemodels.api import NeuralNet
+    
+    from neural_net.neural_net import NeuralNet
        
     class Sin(Component): 
         
@@ -43,15 +44,14 @@ it easy to identify.
 .. testcode:: NN_MetaModel_parts
 
     class Simulation(Assembly):        
-        def __init__(self):
-                super(Simulation,self).__init__()
+        def configure(self):
     
-        #Components
-        self.add("sin_meta_model",MetaModel())      
-        self.sin_meta_model.surrogate = {"default":NeuralNet()}  
-        self.sin_meta_model.surrogate_args = {"default":{'n_hidden_nodes':5}}
-        self.sin_meta_model.model = Sin()        
-        self.sin_meta_model.recorder = DBCaseRecorder()
+            #Components
+            self.add("sin_meta_model",MetaModel())      
+            self.sin_meta_model.surrogate = {"default":NeuralNet()}  
+            self.sin_meta_model.surrogate_args = {"default":{'n_hidden_nodes':5}}
+            self.sin_meta_model.model = Sin()        
+            self.sin_meta_model.recorders = [DBCaseRecorder()]
 
 Once the MetaModel component is in place, the first step is to fill the `surrogate` slot.  In this case we set the
 default to ``NeuralNet``, meaning that all outputs would be modeled  with NeuralNet surrogate models. However,
@@ -80,7 +80,7 @@ Once the surrogate and model slots of the MetaModel have been filled, the MetaMo
         self.DOE_Trainer.add_parameter("sin_meta_model.x")
         self.DOE_Trainer.case_outputs = ["sin_meta_model.f_x"]
         self.DOE_Trainer.add_event("sin_meta_model.train_next")
-        self.DOE_Trainer.recorder = DBCaseRecorder()
+        self.DOE_Trainer.recorders = [DBCaseRecorder()]
         self.DOE_Trainer.force_execute = True
         
 In this case, we're going to train with a DOEdriver called ``DOE_Trainer``.   We specify a FullFactorial
@@ -115,7 +115,7 @@ Here, ``sin_calc`` is also added, so we can calculate an actual and a predicted 
         self.DOE_Validate.DOEgenerator.num_samples = 20
         self.DOE_Validate.add_parameter(("sin_meta_model.x","sin_calc.x"))
         self.DOE_Validate.case_outputs = ["sin_calc.f_x","sin_meta_model.f_x"]
-        self.DOE_Validate.recorder = DBCaseRecorder()
+        self.DOE_Validate.recorders = [DBCaseRecorder()]
         self.DOE_Validate.force_execute = True
         
 Notice that the ``train_next`` event is not added to the ``DOE_Validate`` driver, like it was for for the
@@ -168,8 +168,8 @@ can access and print the run data.
         sim.run()
                    
         #This is how you can access any of the data
-        train_data = sim.DOE_Trainer.recorder.get_iterator()
-        validate_data = sim.DOE_Validate.recorder.get_iterator()
+        train_data = sim.DOE_Trainer.recorders[0].get_iterator()
+        validate_data = sim.DOE_Validate.recorders[0].get_iterator()
         train_inputs = [case['sin_meta_model.x'] for case in train_data]
         train_actual = [case['sin_meta_model.f_x'] for case in train_data]
         inputs = [case['sin_calc.x'] for case in validate_data]    
