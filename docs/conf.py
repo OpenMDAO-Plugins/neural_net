@@ -148,4 +148,3 @@ todo_include_todos = True
 intersphinx_mapping = {'http://docs.python.org/dev': None}
 
 autodoc_member_order = 'groupwise'
-

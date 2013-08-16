@@ -14,5 +14,5 @@ built from ffnet version 0.7, released 09/09/2011.
 
 To view the Sphinx documentation for this distribution, type:
 
-plugin_docs neural_net
+openmdao docs neural_net
 
