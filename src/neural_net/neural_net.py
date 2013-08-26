@@ -26,6 +26,7 @@ class NeuralNet(Container):
         n_hidden_nodes: int
             number of hidden nodes
         """
+        super(NeuralNet, self).__init__()
         self.n_hidden_nodes = n_hidden_nodes
         
     def get_uncertain_value(self, value):
