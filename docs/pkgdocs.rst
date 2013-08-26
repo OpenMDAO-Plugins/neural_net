@@ -16,8 +16,17 @@ Package Metadata
 
     [openmdao.surrogatemodel]
     neural_net.neural_net.NeuralNet=neural_net.neural_net:NeuralNet
+    [openmdao.component]
+    test_neural_net.Sin=test_neural_net:Sin
+    test_neural_net.Simulation=test_neural_net:Simulation
+    NN_sin.Simulation=NN_sin:Simulation
+    NN_sin.Sin=NN_sin:Sin
     [openmdao.container]
+    test_neural_net.Sin=test_neural_net:Sin
+    test_neural_net.Simulation=test_neural_net:Simulation
     neural_net.neural_net.NeuralNet=neural_net.neural_net:NeuralNet
+    NN_sin.Simulation=NN_sin:Simulation
+    NN_sin.Sin=NN_sin:Sin
 
 - **home-page:** https://github.com/OpenMDAO-Plugins/neural_net
 
@@ -47,5 +56,5 @@ Package Metadata
 
 - **summary:** OpenMDAO wrapper for a Feedforward Neural Net surrogate model that can be slotted into the MetaModel component
 
-- **version:** 0.6
+- **version:** 0.7
 
