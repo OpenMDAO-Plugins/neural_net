@@ -9,84 +9,94 @@ from openmdao.lib.datatypes.api import Float
 from openmdao.lib.drivers.api import DOEdriver
 from openmdao.lib.doegenerators.api import FullFactorial, Uniform
 from openmdao.lib.components.api import MetaModel
-from openmdao.lib.casehandlers.api import DBCaseRecorder
 
 from neural_net.neural_net import NeuralNet
 
-class Sin(Component): 
-    
-    x = Float(0,iotype="in",units="rad",low=0,high=20)
-    
-    f_x = Float(0.0,iotype="out")
-    
-    def execute(self): 
+
+class Sin(Component):
+
+    x = Float(0, iotype="in", units="rad", low=0, high=20)
+
+    f_x = Float(0.0, iotype="out")
+
+    def execute(self):
         self.f_x = .5*sin(self.x)
-        
-        
+
+
 class Simulation(Assembly):
 
-        
     def __init__(self):
-        super(Simulation,self).__init__()
-    
+        super(Simulation, self).__init__()
+
         #Components
-        self.add("sin_meta_model",MetaModel())      
-        self.sin_meta_model.surrogate = {"default":NeuralNet()}  
-        self.sin_meta_model.surrogate_args = {"default":{'n_hidden_nodes':5}}
-        self.sin_meta_model.model = Sin()        
-        self.sin_meta_model.recorder = DBCaseRecorder()
-        
+        self.add("sin_calc", Sin())
+        self.add("sin_meta_model", MetaModel(params=('x',),
+                                             responses=('f_x',)))
+        self.sin_meta_model.default_surrogate = NeuralNet(n_hidden_nodes=5)
+
         #Training the MetaModel
-        self.add("DOE_Trainer",DOEdriver())
+        self.add("DOE_Trainer", DOEdriver())
         self.DOE_Trainer.DOEgenerator = FullFactorial()
-        self.DOE_Trainer.DOEgenerator.num_levels = 25
-        self.DOE_Trainer.add_parameter("sin_meta_model.x")
-        self.DOE_Trainer.case_outputs = ["sin_meta_model.f_x"]
-        self.DOE_Trainer.add_event("sin_meta_model.train_next")
-        self.DOE_Trainer.recorders = [DBCaseRecorder()]
-        self.DOE_Trainer.force_execute = True
-        
+        # Seems to need a lot of training data for decent prediction of sin(x),
+        # at least with default 'cg' method.
+        self.DOE_Trainer.DOEgenerator.num_levels = 250
+        self.DOE_Trainer.add_parameter("sin_calc.x", low=0, high=20)
+        self.DOE_Trainer.add_response("sin_calc.f_x")
+
+        self.connect('DOE_Trainer.case_inputs.sin_calc.x',
+                     'sin_meta_model.params.x')
+        self.connect('DOE_Trainer.case_outputs.sin_calc.f_x',
+                     'sin_meta_model.responses.f_x')
+
         #MetaModel Validation
-        self.add("sin_calc",Sin())
-        self.add("DOE_Validate",DOEdriver())
+        self.add("DOE_Validate", DOEdriver())
+        self.DOE_Validate.workflow = SequentialWorkflow()
         self.DOE_Validate.DOEgenerator = Uniform()
         self.DOE_Validate.DOEgenerator.num_samples = 100
-        self.DOE_Validate.add_parameter(("sin_meta_model.x","sin_calc.x"))
-        self.DOE_Validate.case_outputs = ["sin_calc.f_x","sin_meta_model.f_x"]
-        self.DOE_Validate.recorders = [DBCaseRecorder()]
-        self.DOE_Validate.force_execute = True
-        
-        #Iteration Hierarchy
-        self.driver.workflow = SequentialWorkflow()
-        self.driver.workflow.add(['DOE_Trainer','DOE_Validate'])
-        self.DOE_Trainer.workflow.add('sin_meta_model')
-        self.DOE_Validate.workflow.add('sin_meta_model')
-        self.DOE_Validate.workflow.add('sin_calc')        
+        self.DOE_Validate.add_parameter(("sin_meta_model.x", "sin_calc.x"),
+                                        low=0, high=20)
+        self.DOE_Validate.add_response("sin_calc.f_x")
+        self.DOE_Validate.add_response("sin_meta_model.f_x")
 
-class NeuralNetTestCase(unittest.TestCase): 
-    
-    def setUp(self): 
+        #Iteration Hierarchy
+        self.driver.workflow.add(['DOE_Trainer', 'DOE_Validate'])
+        self.DOE_Trainer.workflow.add('sin_calc')
+        self.DOE_Validate.workflow.add(('sin_calc', 'sin_meta_model'))
+
+
+class NeuralNetTestCase(unittest.TestCase):
+
+    def setUp(self):
         numpy_random.seed(10)
-    
-    def testNeuralNetTraining(self): 
+
+    def test_training(self):
         sim = Simulation()
         sim.run()
-        
+
         #This is how you can access any of the data
-        train_data = sim.DOE_Trainer.recorders[0].get_iterator()
-        validate_data = sim.DOE_Validate.recorders[0].get_iterator()
-        train_inputs = [case['sin_meta_model.x'] for case in train_data]
-        train_actual = [case['sin_meta_model.f_x'] for case in train_data]
-        inputs = [case['sin_calc.x'] for case in validate_data]    
-        actual = [case['sin_calc.f_x'] for case in validate_data]  
-        predicted = [case['sin_meta_model.f_x'] for case in validate_data]
-        
-        avg_error = sum([abs(p-a) for a,p in zip(actual,predicted)])/len(actual)
-        
+        train_inputs = sim.DOE_Trainer.case_inputs.sin_calc.x
+        train_actual = sim.DOE_Trainer.case_outputs.sin_calc.f_x
+        inputs = sim.DOE_Validate.case_inputs.sin_meta_model.x
+        actual = sim.DOE_Validate.case_outputs.sin_calc.f_x
+        predicted = sim.DOE_Validate.case_outputs.sin_meta_model.f_x
+
+        avg_error = sum([abs(p-a) for a, p in zip(actual, predicted)])/len(actual)
+
+#        print
+#        for a, p in zip(actual, predicted):
+#            print 'predicted, actual, error', p, a, p-a
+#        print 'average error', avg_error
+#
+#        import pylab
+#        pylab.scatter(train_inputs, train_actual, c='g', label='training data')
+#        pylab.scatter(inputs, predicted, c='b', label='predicted result')
+#        pylab.scatter(inputs, actual, c='r', label='correct result')
+#        pylab.legend()
+#        pylab.show()
+
         self.assertTrue(avg_error <= .08)
-        
-    
+
+
 if __name__ == "__main__":
     unittest.main()
-
 

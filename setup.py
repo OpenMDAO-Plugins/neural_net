@@ -60,12 +60,14 @@ kwargs = {'author': 'Caitlin Kavenaugh',
                                  'sphinx_build/html/_images/NNTutorial.png',
                                  'sphinx_build/html/_downloads/NN_sin.py',
                                  'test/__init__.py',
+                                 'test/DOE_Trainer.csv',
+                                 'test/DOE_Validate.csv',
                                  'test/openmdao_log.txt',
                                  'test/test_neural_net.py']},
  'package_dir': {'': 'src'},
  'packages': ['neural_net', 'neural_net.test'],
  'url': 'https://github.com/OpenMDAO-Plugins/neural_net',
- 'version': '0.7',
+ 'version': '0.8',
  'zip_safe': False}
 
 
