@@ -17,16 +17,12 @@ Package Metadata
     [openmdao.surrogatemodel]
     neural_net.neural_net.NeuralNet=neural_net.neural_net:NeuralNet
     [openmdao.component]
-    neural_net.test.test_neural_net.Sin=neural_net.test.test_neural_net:Sin
     neural_net.test.test_neural_net.Simulation=neural_net.test.test_neural_net:Simulation
-    NN_sin.Simulation=NN_sin:Simulation
-    NN_sin.Sin=NN_sin:Sin
+    neural_net.test.test_neural_net.Sin=neural_net.test.test_neural_net:Sin
     [openmdao.container]
     neural_net.test.test_neural_net.Sin=neural_net.test.test_neural_net:Sin
-    NN_sin.Sin=NN_sin:Sin
-    neural_net.neural_net.NeuralNet=neural_net.neural_net:NeuralNet
     neural_net.test.test_neural_net.Simulation=neural_net.test.test_neural_net:Simulation
-    NN_sin.Simulation=NN_sin:Simulation
+    neural_net.neural_net.NeuralNet=neural_net.neural_net:NeuralNet
 
 - **home-page:** https://github.com/OpenMDAO-Plugins/neural_net
 
