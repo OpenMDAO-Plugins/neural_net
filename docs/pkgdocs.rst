@@ -52,5 +52,5 @@ Package Metadata
 
 - **summary:** OpenMDAO wrapper for a Feedforward Neural Net surrogate model that can be slotted into the MetaModel component
 
-- **version:** 0.8
+- **version:** 0.9
 
